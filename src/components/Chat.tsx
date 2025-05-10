@@ -106,8 +106,8 @@ export const Chat = ({ sessionId }: ChatProps) => {
   };
 
   return (
-    <div className="h-full flex flex-col max-w-full mx-auto">
-      <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
+    <div className="h-full flex flex-col max-w-full mx-auto bg-gray-50">
+      <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
         {messages.map((message) => (
           <div
             key={message.id}
@@ -116,10 +116,10 @@ export const Chat = ({ sessionId }: ChatProps) => {
             }`}
           >
             <div
-              className={`max-w-[80%] p-3 rounded-lg text-left ${
+              className={`max-w-[80%] min-w-[200px] p-4 rounded-2xl text-left text-base font-medium shadow-sm ${
                 message.role === "user"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-100 text-black"
+                  ? "bg-blue-200 text-blue-800"
+                  : "bg-white text-gray-700 border border-gray-100"
               }`}
             >
               {message.role === "assistant" &&
@@ -142,25 +142,25 @@ export const Chat = ({ sessionId }: ChatProps) => {
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="p-4 border-t border-gray-200 bg-white flex gap-2"
+        className="p-6 border-t border-gray-100 bg-white shadow-sm flex gap-3"
       >
         <input
           type="text"
           {...register("content")}
-          className="flex-1 p-3 rounded-md border border-gray-200 outline-none focus:border-blue-500"
+          className="flex-1 p-4 rounded-xl border border-gray-200 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 text-base font-medium transition-all"
           placeholder="Type your message..."
           disabled={isLoading}
         />
         <button
           type="submit"
           disabled={isLoading}
-          className="px-6 py-3 bg-blue-500 text-white border-none rounded-md cursor-pointer disabled:opacity-50 hover:bg-blue-600 transition-colors"
+          className="px-8 py-4 bg-white text-blue-600 border-2 border-blue-400 rounded-xl cursor-pointer disabled:opacity-50 hover:bg-blue-50 transition-all shadow-sm hover:shadow-md font-medium flex items-center justify-center min-w-[120px]"
         >
           {isLoading ? "Sending..." : "Send"}
         </button>
       </form>
       {errors.content && (
-        <p className="text-red-500 text-sm mx-4 my-2">
+        <p className="text-red-500 text-sm mx-6 my-2">
           {errors.content.message}
         </p>
       )}
