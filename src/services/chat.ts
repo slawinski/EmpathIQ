@@ -1,7 +1,14 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import type { Message } from "../types/chat";
+import { SYSTEM_MESSAGE } from "../constants/systemMessage";
 
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+if (!apiKey) {
+  throw new Error(
+    "VITE_GEMINI_API_KEY is not set. Please check your .env file."
+  );
+}
+const genAI = new GoogleGenerativeAI(apiKey);
 const model = genAI.getGenerativeModel({
   model: "gemini-2.0-flash",
   generationConfig: {
@@ -12,9 +19,10 @@ const model = genAI.getGenerativeModel({
   },
 });
 
-export const sendMessage = async (messages: Message[]): Promise<string> => {
+export async function sendMessage(messages: Message[]): Promise<string> {
   try {
     const chat = model.startChat({
+      systemInstruction: { role: "user", parts: [{ text: SYSTEM_MESSAGE }] },
       history: messages.map((msg) => ({
         role: msg.role === "user" ? "user" : "model",
         parts: [{ text: msg.content }],
@@ -30,4 +38,4 @@ export const sendMessage = async (messages: Message[]): Promise<string> => {
     console.error("Error sending message to Gemini:", error);
     throw error;
   }
-};
+}

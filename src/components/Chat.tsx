@@ -49,12 +49,12 @@ export const Chat = ({ sessionId }: ChatProps) => {
       timestamp: Date.now(),
     };
 
-    setMessages((prev) => [...prev, userMessage]);
-    reset();
     setIsLoading(true);
+    reset();
 
     try {
-      const response = await sendMessage([...messages, userMessage]);
+      const response = await sendMessage([userMessage]);
+
       const assistantMessage: Message = {
         id: crypto.randomUUID(),
         content: response,
@@ -62,12 +62,12 @@ export const Chat = ({ sessionId }: ChatProps) => {
         timestamp: Date.now(),
       };
 
-      const updatedMessages = [...messages, userMessage, assistantMessage];
-      setMessages(updatedMessages);
+      // Now update the state with both messages
+      setMessages((prev) => [...prev, userMessage, assistantMessage]);
 
       const session: ChatSession = {
         id: sessionId,
-        messages: updatedMessages,
+        messages: [...messages, userMessage, assistantMessage],
         createdAt: Date.now(),
         updatedAt: Date.now(),
       };
