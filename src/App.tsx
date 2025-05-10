@@ -6,11 +6,9 @@ function App() {
   const [sessionId] = useState(() => crypto.randomUUID());
 
   return (
-    <div className="flex flex-col">
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
-          <h1 className="text-2xl font-bold text-gray-900">EmpathIQ</h1>
-        </div>
+    <div className="h-screen flex flex-col">
+      <header className="p-4 border-b border-gray-200">
+        <h1 className="m-0">EmpathIQ</h1>
       </header>
       <main className="flex-1 overflow-hidden">
         <Chat sessionId={sessionId} />
