@@ -106,8 +106,8 @@ export const Chat = ({ sessionId }: ChatProps) => {
   };
 
   return (
-    <div className="h-full flex flex-col max-w-full min-w-[800px] mx-auto bg-gray-50">
-      <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
+    <div className="h-full flex flex-col w-full mx-auto bg-gray-50">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 flex flex-col gap-4 sm:gap-6">
         {messages.map((message) => (
           <div
             key={message.id}
@@ -116,7 +116,7 @@ export const Chat = ({ sessionId }: ChatProps) => {
             }`}
           >
             <div
-              className={`max-w-[80%] min-w-[200px] p-4 rounded-2xl text-left text-base font-normal shadow-sm ${
+              className={`max-w-[85%] sm:max-w-[80%] min-w-[120px] sm:min-w-[200px] p-3 sm:p-4 rounded-2xl text-left text-sm sm:text-base font-normal shadow-sm ${
                 message.role === "user"
                   ? "bg-blue-200 text-blue-800"
                   : "bg-white text-gray-700 border border-gray-100"
@@ -142,19 +142,19 @@ export const Chat = ({ sessionId }: ChatProps) => {
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="p-6 border-t border-gray-100 bg-white shadow-sm flex gap-3"
+        className="p-4 sm:p-6 border-t border-gray-100 bg-white shadow-sm flex gap-2 sm:gap-3"
       >
         <input
           type="text"
           {...register("content")}
-          className="flex-1 p-4 rounded-xl border border-gray-200 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 text-base font-normal transition-all"
+          className="flex-1 p-3 sm:p-4 rounded-xl border border-gray-200 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 text-sm sm:text-base font-normal transition-all"
           placeholder="Type your message..."
           disabled={isLoading}
         />
         <button
           type="submit"
           disabled={isLoading}
-          className="px-8 py-4 bg-white text-blue-600 border-2 border-blue-400 rounded-xl cursor-pointer disabled:opacity-50 hover:bg-blue-50 transition-all shadow-sm hover:shadow-md font-normal flex items-center justify-center min-w-[120px]"
+          className="px-4 sm:px-8 py-3 sm:py-4 bg-white text-blue-600 border-2 border-blue-400 rounded-xl cursor-pointer disabled:opacity-50 hover:bg-blue-50 transition-all shadow-sm hover:shadow-md font-normal flex items-center justify-center min-w-[80px] sm:min-w-[120px] text-sm sm:text-base"
         >
           {isLoading ? "Sending..." : "Send"}
         </button>
