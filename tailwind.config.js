@@ -8,6 +8,10 @@ export default {
           "0%": { opacity: "0", transform: "translate(-50%, 1rem)" },
           "100%": { opacity: "1", transform: "translate(-50%, 0)" },
         },
+        fadeOut: {
+          "0%": { opacity: "1", transform: "translate(-50%, 0)" },
+          "100%": { opacity: "0", transform: "translate(-50%, 1rem)" },
+        },
       },
     },
   },

@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useRef, useEffect } from "react";
 
 const messageSchema = z.object({
   content: z.string().min(1, "Message cannot be empty"),
@@ -14,6 +15,7 @@ interface MessageFormProps {
 }
 
 export const MessageForm = ({ onSubmit, isLoading }: MessageFormProps) => {
+  const inputRef = useRef<HTMLInputElement>(null);
   const {
     register,
     handleSubmit,
@@ -23,9 +25,16 @@ export const MessageForm = ({ onSubmit, isLoading }: MessageFormProps) => {
     resolver: zodResolver(messageSchema),
   });
 
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
   const handleFormSubmit = async (data: MessageFormData) => {
     await onSubmit(data);
     reset();
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 0);
   };
 
   return (
@@ -37,6 +46,10 @@ export const MessageForm = ({ onSubmit, isLoading }: MessageFormProps) => {
         <input
           type="text"
           {...register("content")}
+          ref={(e) => {
+            register("content").ref(e);
+            inputRef.current = e;
+          }}
           className={`w-full p-3 sm:p-4 rounded-xl border ${
             errors.content ? "border-red-500" : "border-gray-200"
           } outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 text-sm sm:text-base font-normal transition-all`}
@@ -66,7 +79,7 @@ export const MessageForm = ({ onSubmit, isLoading }: MessageFormProps) => {
       <button
         type="submit"
         disabled={isLoading}
-        className="px-4 sm:px-8 py-3 sm:py-4 bg-white text-blue-600 border-2 border-blue-400 rounded-xl cursor-pointer disabled:opacity-50 hover:bg-blue-50 transition-all shadow-sm hover:shadow-md font-normal flex items-center justify-center min-w-[80px] sm:min-w-[120px] text-sm sm:text-base"
+        className="px-6 py-2.5 rounded-md bg-blue-600 text-white shadow-md hover:bg-blue-700 active:bg-blue-800 transition-all duration-200 ease-in-out transform disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:bg-blue-600 flex items-center justify-center min-w-[80px] sm:min-w-[120px] text-sm font-medium tracking-wide"
       >
         {isLoading ? "Sending..." : "Send"}
       </button>

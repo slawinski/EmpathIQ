@@ -16,8 +16,6 @@ export const MessageThread = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
-  const [debouncedShowScrollButton, setDebouncedShowScrollButton] =
-    useState(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -26,15 +24,6 @@ export const MessageThread = ({
   useEffect(() => {
     scrollToBottom();
   }, [messages, streamingContent]);
-
-  // Debounce the scroll button visibility
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedShowScrollButton(showScrollButton);
-    }, 200); // 500ms delay
-
-    return () => clearTimeout(timer);
-  }, [showScrollButton]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -54,7 +43,7 @@ export const MessageThread = ({
     <div className="relative flex-1 h-full">
       <div
         ref={containerRef}
-        className="absolute inset-0 overflow-y-auto px-4 sm:px-6 lg:px-24 xl:px-48 2xl:px-64 py-4 sm:py-6 flex flex-col gap-4 sm:gap-6 pb-24"
+        className="absolute inset-0 overflow-y-auto px-4 sm:px-6 lg:px-24 xl:px-48 2xl:px-64 py-4 sm:py-6 flex flex-col gap-4 sm:gap-6 pb-24 text-base"
       >
         {messages.map((message) =>
           message.role === "user" ? (
@@ -70,9 +59,7 @@ export const MessageThread = ({
         )}
         <div ref={messagesEndRef} />
       </div>
-      {debouncedShowScrollButton && (
-        <ScrollToBottomButton onClick={scrollToBottom} />
-      )}
+      {showScrollButton && <ScrollToBottomButton onClick={scrollToBottom} />}
     </div>
   );
 };
