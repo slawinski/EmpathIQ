@@ -42,8 +42,8 @@ export async function* streamMessage(
       const text = chunk.text();
       if (text) {
         yield text;
-        // Add a small delay between chunks (adjust the delay time as needed)
-        await delay(30); // 30ms delay between chunks
+        // Add a longer delay between chunks for a more natural reading pace
+        await delay(500); // 100ms delay between chunks
       }
     }
   } catch (error) {
