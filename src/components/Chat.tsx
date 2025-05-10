@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import ReactMarkdown from "react-markdown";
 import type { Message, ChatSession } from "../types/chat";
 import { saveChatSession, getChatSession } from "../utils/storage";
 import { streamMessage } from "../services/chat";
@@ -122,9 +123,17 @@ export const Chat = ({ sessionId }: ChatProps) => {
               }`}
             >
               {message.role === "assistant" &&
-              message.id === messages[messages.length - 1]?.id
-                ? streamingContent || message.content
-                : message.content}
+              message.id === messages[messages.length - 1]?.id ? (
+                <div className="prose prose-sm max-w-none dark:prose-invert">
+                  <ReactMarkdown>
+                    {streamingContent || message.content}
+                  </ReactMarkdown>
+                </div>
+              ) : (
+                <div className="prose prose-sm max-w-none dark:prose-invert">
+                  <ReactMarkdown>{message.content}</ReactMarkdown>
+                </div>
+              )}
             </div>
           </div>
         ))}
