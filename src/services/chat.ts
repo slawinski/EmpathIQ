@@ -19,12 +19,46 @@ const model = genAI.getGenerativeModel({
   },
 });
 
-export async function sendMessage(messages: Message[]): Promise<string> {
+// Helper function to add delay
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+export async function* streamMessage(
+  messages: Message[]
+): AsyncGenerator<string> {
   try {
     const chat = model.startChat({
       systemInstruction: { role: "user", parts: [{ text: SYSTEM_MESSAGE }] },
       history: messages.map((msg) => ({
         role: msg.role === "user" ? "user" : "model",
+        parts: [{ text: msg.content }],
+      })),
+    });
+
+    const result = await chat.sendMessageStream(
+      messages[messages.length - 1].content
+    );
+
+    for await (const chunk of result.stream) {
+      const text = chunk.text();
+      if (text) {
+        yield text;
+        // Add a small delay between chunks (adjust the delay time as needed)
+        await delay(30); // 30ms delay between chunks
+      }
+    }
+  } catch (error) {
+    console.error("Error streaming message from Gemini:", error);
+    throw error;
+  }
+}
+
+// Keep the original sendMessage for non-streaming use cases
+export async function sendMessage(messages: Message[]): Promise<string> {
+  try {
+    const chat = model.startChat({
+      systemInstruction: { role: "user", parts: [{ text: SYSTEM_MESSAGE }] },
+      history: messages.map((msg) => ({
+        role: msg.role === "user" ? "model" : "model",
         parts: [{ text: msg.content }],
       })),
     });

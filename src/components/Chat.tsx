@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import type { Message, ChatSession } from "../types/chat";
 import { saveChatSession, getChatSession } from "../utils/storage";
-import { sendMessage } from "../services/chat";
+import { streamMessage } from "../services/chat";
 
 const messageSchema = z.object({
   content: z.string().min(1, "Message cannot be empty"),
@@ -19,6 +19,7 @@ interface ChatProps {
 export const Chat = ({ sessionId }: ChatProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [streamingContent, setStreamingContent] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const {
@@ -39,7 +40,7 @@ export const Chat = ({ sessionId }: ChatProps) => {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, streamingContent]);
 
   const onSubmit = async (data: MessageFormData) => {
     const userMessage: Message = {
@@ -50,24 +51,47 @@ export const Chat = ({ sessionId }: ChatProps) => {
     };
 
     setIsLoading(true);
+    setStreamingContent("");
     reset();
 
     try {
-      const response = await sendMessage([userMessage]);
+      // Add user message immediately
+      setMessages((prev) => [...prev, userMessage]);
 
+      // Create a temporary assistant message
       const assistantMessage: Message = {
         id: crypto.randomUUID(),
-        content: response,
+        content: "",
         role: "assistant",
         timestamp: Date.now(),
       };
 
-      // Now update the state with both messages
-      setMessages((prev) => [...prev, userMessage, assistantMessage]);
+      // Add the empty assistant message
+      setMessages((prev) => [...prev, assistantMessage]);
 
+      // Stream the response
+      let fullResponse = "";
+      for await (const chunk of streamMessage([...messages, userMessage])) {
+        fullResponse += chunk;
+        setStreamingContent(fullResponse);
+      }
+
+      // Update the assistant message with the full response
+      const updatedAssistantMessage = {
+        ...assistantMessage,
+        content: fullResponse,
+      };
+
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === assistantMessage.id ? updatedAssistantMessage : msg
+        )
+      );
+
+      // Save the session
       const session: ChatSession = {
         id: sessionId,
-        messages: [...messages, userMessage, assistantMessage],
+        messages: [...messages, userMessage, updatedAssistantMessage],
         createdAt: Date.now(),
         updatedAt: Date.now(),
       };
@@ -76,6 +100,7 @@ export const Chat = ({ sessionId }: ChatProps) => {
       console.error("Failed to send message:", error);
     } finally {
       setIsLoading(false);
+      setStreamingContent("");
     }
   };
 
@@ -90,13 +115,16 @@ export const Chat = ({ sessionId }: ChatProps) => {
             }`}
           >
             <div
-              className={`max-w-[80%] p-3 rounded-lg ${
+              className={`max-w-[80%] p-3 rounded-lg text-left ${
                 message.role === "user"
                   ? "bg-blue-500 text-white"
                   : "bg-gray-100 text-black"
               }`}
             >
-              {message.content}
+              {message.role === "assistant" &&
+              message.id === messages[messages.length - 1]?.id
+                ? streamingContent || message.content
+                : message.content}
             </div>
           </div>
         ))}
